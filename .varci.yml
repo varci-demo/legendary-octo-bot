@@ -1,0 +1,25 @@
+filters:
+
+  - name: "Auto-merge updates to one of README.md or LICENSE"
+    events: pull_request
+    files: [ README.md, LICENSE ]
+    merge: true
+    message: '@{{ user.login }}, thanks!'
+    when:
+      - action = "opened" or action = "reopened"
+      - changed_files = 1
+
+  - name: "Close and label as invalid when insufficient body"
+    events: issues
+    close: true
+    label: invalid
+    message: >
+      @{{ user.login }}, the issue body should be longer than 50 characters.
+    when: (action = "opened" or action = "reopened") and length(body) < 50
+
+  - name: "Label issues as bug when checked in GitHub template"
+    events: [ issues, pull_request ]
+    label: bug
+    when:
+      - body contains "[x] Bug"
+      - action = "opened" or action = "reopened"
